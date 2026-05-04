@@ -19,9 +19,9 @@ public class Juego {
     
     public Juego() {
         lienzo = new Lienzo();
-        lienzo.ponTamanioLienzo(500,300);
-        lienzo.ponEscalaX(0,500);
-        lienzo.ponEscalaY(0,300);
+        lienzo.ponTamanioLienzo(800,600);
+        lienzo.ponEscalaX(0,800);
+        lienzo.ponEscalaY(0,600);
         teclado = new Entrada(getLienzo());
         heroe = new Heroe(getLienzo());
         heroe.aparecer();
