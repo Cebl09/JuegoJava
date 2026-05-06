@@ -26,6 +26,7 @@ public class Juego {
         heroe = new Heroe(getLienzo());
         heroe.aparecer();
     }
+    //porque funciona el 0 en mostrar
     public void dibujar() {
         getLienzo().dibujo(getHeroe().getX(), getHeroe().getY(), getHeroe().getImagen());
         getLienzo().mostrar(0);
@@ -41,7 +42,7 @@ public class Juego {
         while(miJuego.getHeroe().isVisible()) {
             try {
             miJuego.dibujar();
-            sleep(50);
+            sleep(38);
             miJuego.limpiar();
             miJuego.mover(); 
             } catch (InterruptedException ex) {

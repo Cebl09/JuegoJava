@@ -9,6 +9,10 @@ package juego;
  * @author carloseduardobadillolara
  */
 public abstract class ElementoGrafico {
+    public static final int DERECHA = 1;
+    public static final int IZQUIERDA = -1;
+    public static final int ABAJO = 1;
+    public static final int ARRIBA = -1;
     private int x;
     private int y;
     private boolean visible;
@@ -36,5 +40,4 @@ public abstract class ElementoGrafico {
     }
     public abstract void aparecer();
     public abstract void Mueve(Entrada e);
-    
 }
