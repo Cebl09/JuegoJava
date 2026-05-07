@@ -13,6 +13,7 @@ import edu.epromero.util.Imagen;
  */
 @ComportamientoEnemigo(tipo="Destructor", resistencia = 1, puntos = 50)
 public class Destructor extends NaveEnemiga {
+    private static final int BalaPorSegundo = 78;
     private int direccion;
     private Imagen imagen;
     
@@ -27,23 +28,25 @@ public class Destructor extends NaveEnemiga {
         setX((int)(getLienzo().pideLimiteXMin() + 
             Math.random() * (getLienzo().pideLimiteXMax() - getLienzo().pideLimiteXMin())));
         setVidas(1);
-        setY((int)getLienzo().pideLimiteYMin());
+        setY((int)getLienzo().pideLimiteYMax() - (imagen.alto()));
     }
     @Override
     public void Mueve(Entrada e) {
         setX(getX() + getDireccion() *getVelocidad());
-        if(getX() >= getLienzo().pideLimiteXMax()) {
-            setDireccion(IZQUIERDA);
+        if(getX() > getLienzo().pideLimiteXMax()) {
+           setX((int) getLienzo().pideLimiteXMax());
+        setDireccion(IZQUIERDA);
         }
-        if(getX() <= getLienzo().pideLimiteXMin()) {
-            setDireccion(DERECHA);
+        if(getX() < getLienzo().pideLimiteXMin()) {
+            setX((int) getLienzo().pideLimiteXMin());
+        setDireccion(DERECHA);
         }
             setContadorDisparos(getContadorDisparos() +1);
     }
     @Override
     public boolean quiereDisparar() {
         boolean dispara = false;
-        if(getContadorDisparos() >= 180) {
+        if(getContadorDisparos() >= BalaPorSegundo) {
             setContadorDisparos(0);
             dispara = true;
         }

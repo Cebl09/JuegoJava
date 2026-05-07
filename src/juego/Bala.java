@@ -47,7 +47,7 @@ public class Bala extends ElementoGrafico{
     public void Mueve(Entrada e) {
         if(estado == VUELO) {
             setX(getX() + dx);
-            setY(getY() + dy);
+            setY(getY() - dy);
             if(getY() < lienzo.pideLimiteYMin() ||
                     getY() > lienzo.pideLimiteYMax() ||
                     getX() < lienzo.pideLimiteXMin() ||
@@ -118,6 +118,13 @@ public class Bala extends ElementoGrafico{
      */
     public void setCronometroExplosion(int cronometroExplosion) {
         this.cronometroExplosion = cronometroExplosion;
+    }
+
+    /**
+     * @return the imagen
+     */
+    public Imagen getImagen() {
+        return imagen;
     }
     
 }
