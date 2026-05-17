@@ -6,22 +6,21 @@ package juego;
 
 import edu.epromero.util.Imagen;
 import edu.epromero.util.Lienzo;
-
 /**
  *
  * @author carloseduardobadillolara
  */
 public class Heroe extends ElementoGrafico {
+    public static final int MITAD = 2;
+    public static final int DENTRO = 10;
     private int vida;
     private int velocidad;
-    private Imagen imagen;
-    private Lienzo lienzo;
     
     public Heroe(Lienzo l) {
         vida = 3;
         velocidad = 10;
-        imagen = new Imagen("Heroe.png");
-        lienzo = l;
+        setImagen(new Imagen("/resources/Heroe.png"));
+        setLienzo(l);  
     }
     public int getVida() {
         return vida;
@@ -29,36 +28,49 @@ public class Heroe extends ElementoGrafico {
     public void setVida(int vida) {
         this.vida = vida;
     }
-    public Imagen getImagen() {
-        return imagen;
-    }
     //Acaban los getter y setters
     public void perderVida() {
-        vida = vida-1;
-        if(vida == 0) {
+        setVida(getVida() - 1);
+        if(getVida() <= 0) {
             setVisible(false);
         }
     }
     public void inicia() {
-        vida = 3;
+        setVida(3);
         setVisible(true);
     }
     @Override
     public void aparecer() {
         setVisible(true);
-        setX((int)(lienzo.pideLimiteXMax() + lienzo.pideLimiteXMin())/2);
-        setY((int)lienzo.pideLimiteYMin() + (imagen.alto()/2) + 10);    }
+        setX((int)(getLienzo().pideLimiteXMax() + getLienzo().pideLimiteXMin())/MITAD);
+        setY((int)getLienzo().pideLimiteYMin() + (getImagen().alto()/MITAD) + DENTRO);
+    }
     @Override
     public void Mueve(Entrada e) {
        if(e.izquierda() || e.ratonIzquierda() ) {
-           if(getX() > lienzo.pideLimiteXMin()) {
-               setX(getX() - velocidad);
+           if(getX() > getLienzo().pideLimiteXMin()) {
+               setX(getX() - getVelocidad());
            }
        }
        if(e.derecha() || e.ratonDerecha()) {
-           if(getX() < lienzo.pideLimiteXMax()) {
-               setX(getX() + velocidad);
+           if(getX() < getLienzo().pideLimiteXMax()) {
+               setX(getX() + getVelocidad());
            }
        }
     }
+
+    /**
+     * @return the velocidad
+     */
+    public int getVelocidad() {
+        return velocidad;
+    }
+
+    /**
+     * @param velocidad the velocidad to set
+     */
+    public void setVelocidad(int velocidad) {
+        this.velocidad = velocidad;
+    }
 }
+  

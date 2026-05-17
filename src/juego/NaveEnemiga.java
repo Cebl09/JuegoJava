@@ -6,31 +6,29 @@ package juego;
 
 import edu.epromero.util.ComportamientoEnemigo;
 import edu.epromero.util.Destruible;
-import edu.epromero.util.Imagen;
-import edu.epromero.util.Lienzo;
-
 /**
  *
  * @author carloseduardobadillolara
  */
 public abstract class NaveEnemiga extends ElementoGrafico implements Destruible{
     private int vidas;
-    private Imagen imagen;
-    private Lienzo lienzo;
     private int contadorDisparos;
     private int velocidad;
     
     public NaveEnemiga() {
  
     }
+    @Override
     public abstract void aparecer();
+    @Override
     public abstract void Mueve(Entrada e);
     public abstract boolean quiereDisparar();
     
+    @Override
     public boolean recibirDanio() {
         boolean murio = false;
         setVidas(getVidas() - 1);
-        if(getVidas() == 0) {
+        if(getVidas() <= 0) {
             setVisible(false);
             murio= true;
         }
@@ -45,6 +43,16 @@ public abstract class NaveEnemiga extends ElementoGrafico implements Destruible{
         }
         return puntos;
     }
+    
+    public int getResistencia() {
+        int resistencia = 0;
+        ComportamientoEnemigo anotacion = 
+            this.getClass().getAnnotation(ComportamientoEnemigo.class);
+        if(anotacion != null) {
+            resistencia = anotacion.resistencia();
+    }
+    return resistencia;
+}
     @Override
     public int getVidasActuales() {
         return vidas;
@@ -61,34 +69,6 @@ public abstract class NaveEnemiga extends ElementoGrafico implements Destruible{
      */
     public void setVidas(int vidas) {
         this.vidas = vidas;
-    }
-
-    /**
-     * @return the imagen
-     */
-    public Imagen getImagen() {
-        return imagen;
-    }
-
-    /**
-     * @param imagen the imagen to set
-     */
-    public void setImagen(Imagen imagen) {
-        this.imagen = imagen;
-    }
-
-    /**
-     * @return the lienzo
-     */
-    public Lienzo getLienzo() {
-        return lienzo;
-    }
-
-    /**
-     * @param lienzo the lienzo to set
-     */
-    public void setLienzo(Lienzo lienzo) {
-        this.lienzo = lienzo;
     }
 
     /**

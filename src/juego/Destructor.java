@@ -6,6 +6,7 @@ package juego;
 
 import edu.epromero.util.ComportamientoEnemigo;
 import edu.epromero.util.Imagen;
+import edu.epromero.util.StdRandom;
 
 /**
  *
@@ -13,47 +14,45 @@ import edu.epromero.util.Imagen;
  */
 @ComportamientoEnemigo(tipo="Destructor", resistencia = 1, puntos = 50)
 public class Destructor extends NaveEnemiga {
-    private static final int BalaPorSegundo = 78;
+    private static final int BALAPORSEGUNDO = 78;
     private int direccion;
-    private Imagen imagen;
     
     public Destructor() {
-        setVelocidad(5);
-        imagen = new Imagen("Destructor.png");
-        direccion = DERECHA;
-    }
+    setVelocidad(5);
+    setImagen(new Imagen("/resources/Destructor.png"));
+    direccion = DERECHA;
+}
     @Override
     public void aparecer() {
         setVisible(true);
-        setX((int)(getLienzo().pideLimiteXMin() + 
-            Math.random() * (getLienzo().pideLimiteXMax() - getLienzo().pideLimiteXMin())));
-        setVidas(1);
-        setY((int)getLienzo().pideLimiteYMax() - (imagen.alto()));
+        int xMin = ((int) getLienzo().pideLimiteXMin());
+        int xMax = ((int) getLienzo().pideLimiteXMax());
+        setX(xMin + StdRandom.uniforme(xMax - xMin));
+        setVidas(getResistencia());
+        setY((int)getLienzo().pideLimiteYMax() - getImagen().alto());
     }
+    
     @Override
     public void Mueve(Entrada e) {
-        setX(getX() + getDireccion() *getVelocidad());
-        if(getX() > getLienzo().pideLimiteXMax()) {
-           setX((int) getLienzo().pideLimiteXMax());
-        setDireccion(IZQUIERDA);
+        setX(getX() + getDireccion() * getVelocidad());
+        if(getX() >= 800 - getImagen().ancho()/2) {
+            setX(800 - getImagen().ancho()/2);
+            setDireccion(IZQUIERDA);
         }
-        if(getX() < getLienzo().pideLimiteXMin()) {
-            setX((int) getLienzo().pideLimiteXMin());
-        setDireccion(DERECHA);
+        if(getX() <= getImagen().ancho()/2) {
+            setX(getImagen().ancho()/2);
+            setDireccion(DERECHA);
         }
-            setContadorDisparos(getContadorDisparos() +1);
+        setContadorDisparos(getContadorDisparos() + 1);
     }
     @Override
     public boolean quiereDisparar() {
         boolean dispara = false;
-        if(getContadorDisparos() >= BalaPorSegundo) {
+        if(isVisible() && getContadorDisparos() >= BALAPORSEGUNDO) {
             setContadorDisparos(0);
             dispara = true;
         }
         return dispara;
-    }
-    public Imagen getImagen() {
-        return imagen;
     }
 
     /**
@@ -68,12 +67,5 @@ public class Destructor extends NaveEnemiga {
      */
     public void setDireccion(int direccion) {
         this.direccion = direccion;
-    }
-
-    /**
-     * @param imagen the imagen to set
-     */
-    public void setImagen(Imagen imagen) {
-        this.imagen = imagen;
     }
 }

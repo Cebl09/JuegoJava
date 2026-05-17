@@ -15,15 +15,13 @@ public class Bala extends ElementoGrafico{
     private int estado;
     private int dx;
     private int dy;
-    private Imagen imagen;
-    private Lienzo lienzo;
     private boolean esDelHeroe;
     private int cronometroExplosion;
     
     public Bala(Lienzo l) {
-        lienzo = l;
+        setLienzo(l);
         estado = INACTIVA;
-        imagen = new Imagen("bala.png");
+        setImagen(new Imagen("/resources/bala.png"));
         cronometroExplosion = 0;
     }
     public void activar(int x, int y, int dx, int dy, boolean esDelHeroe) {
@@ -48,12 +46,12 @@ public class Bala extends ElementoGrafico{
         if(estado == VUELO) {
             setX(getX() + dx);
             setY(getY() - dy);
-            if(getY() < lienzo.pideLimiteYMin() ||
-                    getY() > lienzo.pideLimiteYMax() ||
-                    getX() < lienzo.pideLimiteXMin() ||
-                    getX() > lienzo.pideLimiteXMax()) {
-                estado = INACTIVA;
-                setVisible(false);
+            if(getY() < getLienzo().pideLimiteYMin() ||
+                getY() > getLienzo().pideLimiteYMax() ||
+                getX() < getLienzo().pideLimiteXMin() ||
+                getX() > getLienzo().pideLimiteXMax()) {
+            estado = INACTIVA;
+            setVisible(false);
             }
         }
             if(estado == EXPLOTANDO) {
@@ -77,21 +75,7 @@ public class Bala extends ElementoGrafico{
         throw new IllegalArgumentException("Error");
         }
     }
-
-    /**
-     * @param imagen the imagen to set
-     */
-    public void setImagen(Imagen imagen) {
-        this.imagen = imagen;
-    }
-
-    /**
-     * @param lienzo the lienzo to set
-     */
-    public void setLienzo(Lienzo lienzo) {
-        this.lienzo = lienzo;
-    }
-
+    
     /**
      * @return the esDelHeroe
      */
@@ -118,13 +102,5 @@ public class Bala extends ElementoGrafico{
      */
     public void setCronometroExplosion(int cronometroExplosion) {
         this.cronometroExplosion = cronometroExplosion;
-    }
-
-    /**
-     * @return the imagen
-     */
-    public Imagen getImagen() {
-        return imagen;
-    }
-    
+    }    
 }
