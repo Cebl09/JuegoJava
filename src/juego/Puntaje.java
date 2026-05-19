@@ -18,8 +18,9 @@ public class Puntaje {
         this.nombre = nombre;
     }
 
-    public void toString() {
-        
+    @Override
+    public String toString() {
+        return getNombre() + "," + getPuntos();
     }
     /**
      * @return the nombre

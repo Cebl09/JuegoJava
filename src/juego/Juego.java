@@ -8,7 +8,10 @@ import edu.epromero.util.FabricaAudio;
 import edu.epromero.util.Lienzo;
 import static java.lang.Thread.sleep;
 import java.awt.Font;
-import java.io.File;
+import static java.awt.event.KeyEvent.VK_A;
+import static java.awt.event.KeyEvent.VK_BACK_SPACE;
+import static java.awt.event.KeyEvent.VK_ENTER;
+import static java.awt.event.KeyEvent.VK_Z;
 import java.io.InputStream;
 import java.net.URL;
 
@@ -27,6 +30,30 @@ public class Juego {
     public static final int ORIGEN_ESCALA = 0;
     public static final int POS_VENTANA_X = 300;
     public static final int POS_VENTANA_Y = 100;
+    public static final int CAPTURANDO = 3;
+    public static final int HUD_PUNTOS_X = 50;
+    public static final int HUD_VIDA_X = 200;
+    public static final int HUD_NIVEL_X = 340;
+    public static final int HUD_Y = 600;
+    public static final int OFFSET_TITULO = 100;
+    public static final int OFFSET_LINEA_1 = 50;
+    public static final int OFFSET_LINEA_2 = 80;
+    public static final int GO_TITULO = 200;
+    public static final int GO_PUNTAJE = 150;
+    public static final int GO_TOP_INICIO = 110;
+    public static final int GO_REINICIAR = 160;
+    public static final int GO_SALTO = 22;
+    public static final int CAP_TITULO = 50;
+    public static final int CAP_NOMBRE = 50;
+    public static final int CAP_ENTER = 100;
+    public static final int HEROE_BALA_OFFSET_Y = 15;
+    public static final int HEROE_BALA_VEL_Y = -20;
+    public static final int NAVE_BALA_OFFSET_X = 62;
+    public static final int NAVE_BALA_OFFSET_Y = 30;
+    public static final int DESTRUCTOR_BALA_VEL = 5;
+    public static final int NAVE_BALA_VEL_Y = 10;
+    public static final int BALA_VEL_CERO = 0;
+    public static final int MAX_BALAS_DESTRUCTOR = 2;
 
     private Lienzo lienzo;
     private Heroe heroe;
@@ -38,6 +65,9 @@ public class Juego {
     private int estado;
     private Font fuenteTitulo;
     private Font fuenteHUD;
+    private String nombreJugador;
+    private boolean teclaLetraPulsada;
+    private GestorPuntajes gestorPuntajes;
     
     public Juego() {
         lienzo = new Lienzo();
@@ -65,6 +95,9 @@ public class Juego {
         }
         puntos = 0;
         estado = INICIO;
+        nombreJugador = "";
+        teclaLetraPulsada= false;
+        gestorPuntajes = new GestorPuntajes();
     }
     public void dibujar() {
         if (estado == INICIO) {
@@ -73,15 +106,17 @@ public class Juego {
             dibujarPartida();
         } else if (estado == GAMEOVER) {
             dibujarGameOver();
+        } else if(estado == CAPTURANDO) {
+            dibujarCaptura();
         }
         getLienzo().mostrar(0);
     }
     public void dibujarPantallaInicio() {
         lienzo.ponFuente(fuenteTitulo);
-        lienzo.texto(CENTRO_X, CENTRO_Y + 100, "INVASION GALACTICA");
+        lienzo.texto(CENTRO_X, CENTRO_Y + OFFSET_TITULO, "INVASION GALACTICA");
         lienzo.texto(CENTRO_X, CENTRO_Y, "Presiona F2 para empezar");
-        lienzo.texto(CENTRO_X, CENTRO_Y - 50, "Flechas ó A/D para moverse");
-        lienzo.texto(CENTRO_X, CENTRO_Y - 80, "Espacio: disparar");
+        lienzo.texto(CENTRO_X, CENTRO_Y - OFFSET_LINEA_1, "Flechas ó A/D para moverse");
+        lienzo.texto(CENTRO_X, CENTRO_Y - OFFSET_LINEA_2, "Espacio: disparar");
     }
     public void dibujarPartida() {
         if(heroe.isVisible()) {
@@ -98,15 +133,32 @@ public class Juego {
             }
         }
         lienzo.ponFuente(fuenteHUD);
-        lienzo.texto(50, 600, "PUNTOS: "+ puntos);
-        lienzo.texto(200, 600, "VIDA: "+ heroe.getVida());
-        lienzo.texto(340, 600, "NIVEL: 1");
+        lienzo.texto(HUD_PUNTOS_X, HUD_Y, "PUNTOS: "+ puntos);
+        lienzo.texto(HUD_VIDA_X, HUD_Y, "VIDA: "+ heroe.getVida());
+        lienzo.texto(HUD_NIVEL_X, HUD_Y, "NIVEL: 1");
     }
     public void dibujarGameOver() {
         lienzo.ponFuente(fuenteTitulo);
-        lienzo.texto(CENTRO_X, CENTRO_Y +100, "GAME OVER");
-        lienzo.texto(CENTRO_X, CENTRO_Y, "Puntaje Final: "+puntos);
-        lienzo.texto(CENTRO_X, CENTRO_Y -100, "Presiona F2 para reniciar");
+        lienzo.texto(CENTRO_X, CENTRO_Y + GO_TITULO, "GAME OVER");
+        lienzo.texto(CENTRO_X, CENTRO_Y + GO_PUNTAJE, "Puntaje Final: "+puntos);
+        
+        Puntaje[] tabla = gestorPuntajes.getTop();
+        for(int i = 0; i < tabla.length; i++) {
+            if(tabla[i] != null) {
+                int y = CENTRO_Y + GO_TOP_INICIO - (i * GO_SALTO);
+                lienzo.texto(CENTRO_X, y,(i+1) + "." + tabla[i].toString());
+            }
+        }
+        lienzo.texto(CENTRO_X, CENTRO_Y - GO_REINICIAR, "Presiona F2 para reniciar");
+    }
+    
+    public void dibujarCaptura() {
+        lienzo.ponFuente(fuenteTitulo);
+        lienzo.texto(CENTRO_X, CENTRO_Y + CAP_TITULO, "NUEVO RECORD");
+        lienzo.ponFuente(fuenteHUD);
+        lienzo.texto(CENTRO_X, CENTRO_Y, "Escribe tu nombre:");
+        lienzo.texto(CENTRO_X, CENTRO_Y - CAP_NOMBRE, nombreJugador);
+        lienzo.texto(CENTRO_X, CENTRO_Y - CAP_ENTER, "Enter para confirmar");
     }
     
     public void mover() {
@@ -116,6 +168,8 @@ public class Juego {
             moverPartida();
         } else if(estado == GAMEOVER) {
             moverGameOver();
+        } else if(estado == CAPTURANDO) {
+            moverCaptura();
         }
     }
     public void moverPantallaInicio() {
@@ -140,7 +194,7 @@ public class Juego {
             int i = 0;
             while(i < balas.length && !activada) {
                 if(balas[i].getEstado() == Bala.INACTIVA) {
-                    balas[i].activar(heroe.getX(), heroe.getY() -15 , 0, -20, true);
+                    balas[i].activar(heroe.getX(), heroe.getY() - HEROE_BALA_OFFSET_Y , BALA_VEL_CERO, HEROE_BALA_VEL_Y, true);
                     activada = true;
                     URL urlSonido = getClass().getResource("/resources/disparo.wav");
                     getFabricaAudio().reproducir(urlSonido);
@@ -151,12 +205,12 @@ public class Juego {
         if(getNaves()[0].quiereDisparar()) {
             int balasActivadas = 0;
             int i = 0;
-            while(i < balas.length && balasActivadas < 2) {
+            while(i < balas.length && balasActivadas < MAX_BALAS_DESTRUCTOR) {
                 if(balas[i].getEstado() == Bala.INACTIVA) {
                     if(balasActivadas == 0) {
-                        balas[i].activar(getNaves()[0].getX() - 62, getNaves()[0].getY() - 30, 5, 5, false);
+                        balas[i].activar(getNaves()[0].getX() - NAVE_BALA_OFFSET_X, getNaves()[0].getY() - NAVE_BALA_OFFSET_Y, DESTRUCTOR_BALA_VEL, DESTRUCTOR_BALA_VEL, false);
                     } else {
-                        balas[i].activar(getNaves()[0].getX() + 62, getNaves()[0].getY() - 30, 5, 5, false);
+                        balas[i].activar(getNaves()[0].getX() + NAVE_BALA_OFFSET_X, getNaves()[0].getY() - NAVE_BALA_OFFSET_Y, DESTRUCTOR_BALA_VEL, DESTRUCTOR_BALA_VEL, false);
                     }
                     balasActivadas++;
                 }
@@ -168,7 +222,7 @@ public class Juego {
             int i = 0;
             while(i < balas.length && !activada) {
                 if(balas[i].getEstado() == Bala.INACTIVA) {
-                    balas[i].activar(getNaves()[1].getX(), getNaves()[1].getY() - 30, 0, 10, false);
+                    balas[i].activar(getNaves()[1].getX(), getNaves()[1].getY() - NAVE_BALA_OFFSET_Y, BALA_VEL_CERO, NAVE_BALA_VEL_Y, false);
                     activada = true;
                 }
                 i++;
@@ -179,14 +233,19 @@ public class Juego {
             int i = 0;
             while(i < balas.length && !activada) {
                 if(balas[i].getEstado() == Bala.INACTIVA) {
-                    balas[i].activar(getNaves()[2].getX(), getNaves()[2].getY() - 30, 0, 10, false);
+                    balas[i].activar(getNaves()[2].getX(), getNaves()[2].getY() - NAVE_BALA_OFFSET_Y, BALA_VEL_CERO, NAVE_BALA_VEL_Y, false);
                     activada = true;
                 }
                 i++;
             }
         }
         if(heroe.getVida() <= 0) {
-            estado = GAMEOVER;
+            if(gestorPuntajes.califica(puntos)) {
+                estado = CAPTURANDO;
+                teclaLetraPulsada = true;
+            } else {
+                estado = GAMEOVER;
+            }
         }
     }
     
@@ -196,6 +255,35 @@ public class Juego {
             estado = JUGANDO;
         }
     }
+    
+    public void moverCaptura() {
+        boolean algunaPulsada = false;
+        for (int tecla = VK_A; tecla <= VK_Z; tecla++) {
+            if (lienzo.fuePulsadaTecla(tecla)) {
+                algunaPulsada = true;
+                if(!teclaLetraPulsada) {
+                    char letra = (char) tecla;
+                    nombreJugador = nombreJugador + letra;
+                    teclaLetraPulsada = true;
+                }
+            }
+        }
+        if(!algunaPulsada) {
+            teclaLetraPulsada = false;
+        }
+        if(lienzo.fuePulsadaTecla(VK_BACK_SPACE) && !teclaLetraPulsada) {
+            if(nombreJugador.length() > 0) {
+                nombreJugador = nombreJugador.substring(0, nombreJugador.length() -1);
+                teclaLetraPulsada = true;
+            }
+        }
+        
+        if(lienzo.fuePulsadaTecla(VK_ENTER)) {
+            gestorPuntajes.insertar(nombreJugador, puntos);
+            estado = GAMEOVER;
+        }   
+    }
+    
     public void reiniciarJuego() {
         heroe.inicia();
         heroe.aparecer();
@@ -207,6 +295,8 @@ public class Juego {
             balas[i].setEstado(Bala.INACTIVA);
             balas[i].setVisible(false);
         }
+        nombreJugador = "";
+        teclaLetraPulsada = false;
         puntos = 0;
     }
     public void limpiar() {
